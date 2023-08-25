@@ -1,0 +1,51 @@
+import socket
+import subprocess
+
+# Method 1: Ping Sweep
+def ping_sweep(subnet):
+    for i in range(1, 255):
+        ip = subnet + str(i)
+        response = subprocess.run(['ping', '-c', '1', ip], stdout=subprocess.PIPE)
+        if response.returncode == 0:
+            print(f"Host {ip} is up")
+
+# Method 2: Port Scanning
+def port_scan(target, ports):
+    for port in ports:
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.settimeout(1)
+        result = sock.connect_ex((target, port))
+        if result == 0:
+            print(f"Port {port} on {target} is open")
+        sock.close()
+
+# Method 3: DNS Resolution
+def dns_lookup(hostnames):
+    for host in hostnames:
+        try:
+            ip = socket.gethostbyname(host)
+            print(f"Hostname: {host} has IP: {ip}")
+        except socket.gaierror:
+            print(f"Could not resolve hostname: {host}")
+
+# Method 4: Traceroute
+def traceroute(target):
+    traceroute_output = subprocess.run(['traceroute', target], stdout=subprocess.PIPE, text=True)
+    print(traceroute_output.stdout)
+
+# Method 5: Network Fingerprinting with nmap
+def nmap_scan(target):
+    nmap_output = subprocess.run(['nmap', '-F', target], stdout=subprocess.PIPE, text=True)
+    print(nmap_output.stdout)
+
+# Execute the methods
+subnet = "192.168.1."
+target_ip = "8.8.8.8"
+ports_to_scan = [80, 443, 21, 22, 3389]
+hostnames_to_lookup = ["www.google.com", "www.microsoft.com", "www.apple.com"]
+
+ping_sweep(subnet)
+port_scan(target_ip, ports_to_scan)
+dns_lookup(hostnames_to_lookup)
+traceroute(target_ip)
+nmap_scan(target_ip)
